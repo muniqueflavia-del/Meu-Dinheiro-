@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#9ba98a">
+<link rel="manifest" href="manifest.json">
+<title>Meu Dinheiro</title>
+<style>
+:root{
+  --panel:#9ba98a;
+  --dark:#0d3329;
+  --gold:#d7aa45;
+  --cream:#f8f7ef;
+  --text:#18221e;
+  --muted:#68716c;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:var(--panel);color:var(--text);
+  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI",Arial,sans-serif}
+body{min-height:100vh;padding-bottom:calc(100px + env(safe-area-inset-bottom))}
+header{
+  background:var(--panel);
+  padding:18px 18px 8px;
+}
+.topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.icon-btn{
+  width:48px;height:48px;border:1px solid rgba(255,255,255,.25);
+  border-radius:15px;background:rgba(13,51,41,.72);color:#fff;font-size:23px
+}
+.hero{
+  width:100%;border-radius:0 0 28px 28px;overflow:hidden;
+  background:var(--dark);box-shadow:0 12px 28px rgba(13,51,41,.18);
+  display:flex;justify-content:center;align-items:center;
+}
+.hero img{
+  display:block;width:100%;height:auto;max-height:470px;
+  object-fit:contain;object-position:center;
+}
+main{max-width:760px;margin:0 auto;padding:10px 18px 24px}
+.section-title{display:flex;justify-content:space-between;align-items:center;margin:12px 6px 14px}
+.section-title h2{font-size:28px;margin:0;font-weight:800}
+.date{font-size:16px}
+.card{
+  background:var(--cream);border-radius:28px;padding:18px;
+  margin:14px 0;box-shadow:0 5px 18px rgba(0,0,0,.08)
+}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.metric{background:#f2f1e9;border-radius:22px;padding:18px 16px}
+.metric span{display:block;color:var(--muted);font-size:15px;margin-bottom:8px}
+.metric b{font-size:27px}
+.green{color:#3c7c50}.gold{color:#a87515}.orange{color:#c66c08}
+.progress{height:16px;background:#dfe1d8;border-radius:20px;overflow:hidden;margin-top:18px}
+.progress>div{height:100%;background:var(--gold);border-radius:20px}
+input,select,button{font:inherit}
+input,select{
+  width:100%;padding:12px;border:1px solid #ddd;border-radius:12px;background:#fff
+}
+button.primary{background:var(--dark);color:#fff;border:0;border-radius:12px;padding:13px 16px}
+label{display:block;color:var(--muted);font-size:14px;margin:10px 0 6px}
+.bottom-nav{
+  position:fixed;z-index:50;left:0;right:0;bottom:0;
+  background:var(--dark);border-radius:27px 27px 0 0;
+  padding:7px 7px calc(7px + env(safe-area-inset-bottom));
+  display:grid;grid-template-columns:repeat(5,1fr);
+  box-shadow:0 10px 30px rgba(0,0,0,.28);
+}
+.bottom-nav button{
+  border:0;background:transparent;color:#fff;border-radius:20px;
+  padding:10px 4px;font-size:14px;min-height:62px
+}
+.bottom-nav button.active{background:var(--gold);color:#17231e;font-weight:700}
+.bottom-nav .emoji{display:block;font-size:20px;margin-bottom:3px}
+.page{display:none}.page.active{display:block}
+@media(max-width:430px){
+  .hero img{max-height:360px}
+  .section-title h2{font-size:25px}
+  .metric b{font-size:24px}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="topbar">
+    <button class="icon-btn" onclick="toggleMenu()">☰</button>
+    <button class="icon-btn" onclick="alert('Lembretes de pagamentos ficam na aba Despesas.')">🔔</button>
+  </div>
+  <div class="hero">
+    <img src="hero-meu-dinheiro.jpg" alt="Meu Dinheiro">
+  </div>
+</header>
+
+<main>
+  <section id="home" class="page active">
+    <div class="section-title"><h2>Resumo da semana</h2><span class="date" id="today"></span></div>
+    <div class="card">
+      <div class="grid">
+        <div class="metric"><span>Renda semanal</span><b class="green" id="incomeText">€ 650,00</b></div>
+        <div class="metric"><span>Guardar</span><b class="gold" id="saveText">€ 250,00</b></div>
+        <div class="metric"><span>Despesas</span><b class="orange" id="expenseText">€ 0,00</b></div>
+        <div class="metric"><span>Disponível</span><b class="green" id="freeText">€ 400,00</b></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>🎯 Meta em euros</h2>
+      <h2 id="goalText">€ 5.000,00</h2>
+      <div id="savedText">€ 0,00 guardados</div>
+      <div class="progress"><div id="bar" style="width:0%"></div></div>
+    </div>
+  </section>
+
+  <section id="expenses" class="page">
+    <div class="section-title"><h2>📋 Despesas</h2></div>
+    <div class="card">
+      <label>Descrição</label><input id="desc" placeholder="Ex.: renda">
+      <label>Valor (€)</label><input id="amount" type="number" step="0.01" placeholder="0,00">
+      <label>Data de pagamento</label><input id="due" type="date">
+      <button class="primary" style="margin-top:12px;width:100%" onclick="addExpense()">Adicionar despesa</button>
+    </div>
+    <div id="expenseList"></div>
+  </section>
+
+  <section id="spend" class="page">
+    <div class="section-title"><h2>➕ Gastos</h2></div>
+    <div class="card">
+      <label>Renda semanal (€)</label><input id="incomeInput" type="number" step="0.01">
+      <label>Quanto quero guardar (€)</label><input id="saveInput" type="number" step="0.01">
+      <button class="primary" style="margin-top:12px;width:100%" onclick="saveSettings()">Salvar valores</button>
+    </div>
+  </section>
+
+  <section id="goals" class="page">
+    <div class="section-title"><h2>🎯 Metas</h2></div>
+    <div class="card">
+      <label>Meta (€)</label><input id="goalInput" type="number" step="0.01">
+      <label>Já guardado (€)</label><input id="savedInput" type="number" step="0.01">
+      <button class="primary" style="margin-top:12px;width:100%" onclick="saveGoal()">Salvar meta</button>
+    </div>
+  </section>
+
+  <section id="more" class="page">
+    <div class="section-title"><h2>⚙️ Mais</h2></div>
+    <div class="card"><p>Seu controle financeiro, simples e organizado.</p></div>
+  </section>
+</main>
+
+<nav class="bottom-nav">
+  <button class="active" onclick="show('home',this)"><span class="emoji">⌂</span>Início</button>
+  <button onclick="show('expenses',this)"><span class="emoji">▣</span>Despesas</button>
+  <button onclick="show('spend',this)"><span class="emoji">＋</span>Gastos</button>
+  <button onclick="show('goals',this)"><span class="emoji">◎</span>Metas</button>
+  <button onclick="show('more',this)"><span class="emoji">•••</span>Mais</button>
+</nav>
+
+<script>
+const KEY='meuDinheiroV3';
+let d=JSON.parse(localStorage.getItem(KEY)||'null')||{
+  income:650,save:250,goal:5000,saved:0,expenses:[]
+};
+
+const euro=n=>new Intl.NumberFormat('pt-PT',{style:'currency',currency:'EUR'}).format(Number(n)||0);
+function persist(){localStorage.setItem(KEY,JSON.stringify(d))}
+function render(){
+  const expenses=d.expenses.reduce((s,x)=>s+Number(x.amount||0),0);
+  const free=Number(d.income)-Number(d.save)-expenses;
+  incomeText.textContent=euro(d.income);
+  saveText.textContent=euro(d.save);
+  expenseText.textContent=euro(expenses);
+  freeText.textContent=euro(free);
+  goalText.textContent=euro(d.goal);
+  savedText.textContent=euro(d.saved)+' guardados';
+  bar.style.width=Math.min(100,(Number(d.saved)/Math.max(1,Number(d.goal)))*100)+'%';
+  incomeInput.value=d.income; saveInput.value=d.save;
+  goalInput.value=d.goal; savedInput.value=d.saved;
+  expenseList.innerHTML=d.expenses.length?d.expenses.map((x,i)=>`
+    <div class="card">
+      <b>${escapeHtml(x.desc)}</b><br>${euro(x.amount)}
+      <div style="color:#68716c;margin-top:6px">Pagamento: ${formatDate(x.due)}</div>
+      <button onclick="removeExpense(${i})" style="margin-top:10px">Excluir</button>
+    </div>`).join(''):'<div class="card">Nenhuma despesa cadastrada.</div>';
+}
+function escapeHtml(s){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
+function formatDate(v){if(!v)return 'sem data';const [y,m,day]=v.split('-');return `${day}/${m}/${y}`}
+function addExpense(){
+  const desc=document.getElementById('desc').value.trim(), amount=Number(document.getElementById('amount').value), due=document.getElementById('due').value;
+  if(!desc||!amount)return alert('Preencha descrição e valor.');
+  d.expenses.push({desc,amount,due});
+  d.expenses.sort((a,b)=>(a.due||'9999').localeCompare(b.due||'9999'));
+  persist();render();desc.value='';amount.value='';due.value='';
+}
+function removeExpense(i){d.expenses.splice(i,1);persist();render()}
+function saveSettings(){d.income=Number(incomeInput.value)||0;d.save=Number(saveInput.value)||0;persist();render();show('home',document.querySelector('.bottom-nav button'))}
+function saveGoal(){d.goal=Number(goalInput.value)||0;d.saved=Number(savedInput.value)||0;persist();render();show('home',document.querySelector('.bottom-nav button'))}
+function show(id,btn){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.querySelectorAll('.bottom-nav button').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');window.scrollTo({top:0,behavior:'smooth'});
+}
+function toggleMenu(){show('more',document.querySelectorAll('.bottom-nav button')[4])}
+today.textContent=new Date().toLocaleDateString('pt-PT',{day:'2-digit',month:'2-digit'});
+render();
+</script>
+</body>
+</html>
