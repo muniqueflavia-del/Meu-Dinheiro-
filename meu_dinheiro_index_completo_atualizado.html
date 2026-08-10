@@ -1,0 +1,206 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#9ba98a">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-180.png">
+<title>Meu Dinheiro</title>
+<style>
+:root{--sage:#9ba98a;--dark:#0d3329;--gold:#d7aa45;--cream:#f8f7ef;--text:#18221e;--muted:#68716c;--red:#a33}
+*{box-sizing:border-box}html,body{margin:0;background:var(--sage);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif}
+body{padding-bottom:94px}.top{display:flex;justify-content:space-between;padding:16px 18px 8px}.icon{width:48px;height:48px;border:0;border-radius:15px;background:#0d3329dd;color:#fff;font-size:22px}
+.hero{background:var(--dark);border-radius:0 0 28px 28px;overflow:hidden}.hero img{display:block;width:100%;max-height:430px;object-fit:contain}
+main{max-width:760px;margin:auto;padding:8px 18px}.page{display:none}.page.active{display:block}
+.title{display:flex;justify-content:space-between;align-items:center;margin:12px 6px}.title h2{margin:0;font-size:27px}
+.card,.goal{background:var(--cream);border-radius:26px;padding:18px;margin:14px 0;box-shadow:0 5px 18px #0001}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.metric{background:#f0f0e8;border-radius:20px;padding:16px}.metric span{display:block;color:var(--muted);margin-bottom:7px}.metric b{font-size:23px}
+.green{color:#3d7a4d}.gold{color:#a87515}.orange{color:#c66c08}.muted{color:var(--muted)}
+.goals{display:grid;grid-template-columns:1fr 1fr;gap:14px}.goal h3{margin:0 0 9px}.big{font-size:24px;font-weight:800}
+.progress{height:13px;background:#dfe1d8;border-radius:20px;overflow:hidden;margin-top:12px}.progress i{display:block;height:100%;background:var(--gold)}
+label{display:block;color:var(--muted);font-size:14px;margin:11px 0 6px}
+input,select{width:100%;padding:12px;border:1px solid #d7d8d1;border-radius:12px;background:#fff;font:inherit}
+.primary,.secondary,.danger{border:0;border-radius:12px;padding:12px 15px;font:inherit;font-weight:650}.primary{background:var(--dark);color:#fff}.secondary{background:#e8ebdf;color:var(--dark)}.danger{background:#f5dddd;color:var(--red)}
+.periods{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.periods button{border:1px solid #d5d8cd;background:#fff;border-radius:12px;padding:11px 4px;font-weight:650}.periods button.selected{background:var(--gold);border-color:var(--gold);color:#17231e}
+.expense{padding:14px 0;border-bottom:1px solid #ddd}.expense:last-child{border-bottom:0}.row{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}.badge{display:inline-block;margin-top:6px;padding:4px 9px;border-radius:20px;background:#e7eadf;font-size:12px;font-weight:700}.soon{background:#fff0c8;color:#8b620d}.late{background:#f8dddd;color:var(--red)}
+.nav{position:fixed;z-index:30;left:0;right:0;bottom:0;background:var(--dark);border-radius:27px 27px 0 0;padding:7px 7px 10px;display:grid;grid-template-columns:repeat(5,1fr);box-shadow:0 -4px 15px #0002}.nav button{border:0;background:transparent;color:#fff;border-radius:20px;padding:9px 2px;min-height:62px;font:inherit;font-size:13px}.nav button.active{background:var(--gold);color:#17231e;font-weight:700}
+.modal{position:fixed;inset:0;background:#0008;z-index:100;display:flex;align-items:center;justify-content:center;padding:20px}.modalbox{background:var(--cream);border-radius:25px;padding:20px;width:min(450px,100%);max-height:90vh;overflow:auto}
+@media(max-width:600px){.goals{grid-template-columns:1fr}.hero img{max-height:350px}.metric b{font-size:21px}}
+</style>
+</head>
+<body>
+<header>
+<div class="top"><button class="icon" onclick="show('more',4)">☰</button><button class="icon">🔔</button></div>
+<div class="hero"><img src="hero-meu-dinheiro.jpg" alt="Meu Dinheiro"></div>
+</header>
+
+<main>
+<section id="home" class="page active">
+<div class="title"><h2 id="summaryTitle">Resumo da semana</h2><span id="date"></span></div>
+<div class="card"><div class="grid">
+<div class="metric"><span id="incomeLabel">Renda semanal</span><b class="green" id="income">€ 0,00</b></div>
+<div class="metric"><span id="saveLabel">Guardar semanal</span><b class="gold" id="save">€ 0,00</b></div>
+<div class="metric"><span>Despesas</span><b class="orange" id="expensesTotal">€ 0,00</b></div>
+<div class="metric"><span>Disponível</span><b class="green" id="free">€ 0,00</b></div>
+</div></div>
+
+<div class="goals">
+<div class="goal"><h3>🎯 Meta em euros</h3><div class="big" id="goal">€ 0,00</div><p class="muted" id="saved">€ 0,00 guardados</p><div class="progress"><i id="bar"></i></div></div>
+<div class="goal"><h3>🇧🇷 Metas no Brasil</h3><div id="homeBrazil"></div></div>
+</div>
+
+<div class="card"><div class="title"><h2>📅 Próximas despesas</h2><button class="secondary" onclick="show('expenses',1)">Ver todas</button></div><div id="homeList"></div></div>
+<div class="card"><div class="title"><h2>⏰ Vencimentos próximos</h2></div><div id="dueList"></div></div>
+</section>
+
+<section id="expenses" class="page">
+<div class="title"><h2>📋 Despesas</h2><button class="primary" onclick="openExpense()">+ Adicionar</button></div>
+<div class="card"><p class="muted">A data é opcional. Use o calendário para escolher o vencimento.</p><div id="list"></div></div>
+</section>
+
+<section id="spend" class="page">
+<div class="title"><h2>➕ Gastos</h2></div>
+<div class="card">
+<h3>💰 Minha renda</h3>
+<label>Valor</label><input id="incomeInput" type="number" step=".01">
+<label>Recebo</label>
+<div class="periods">
+<button data-income="weekly" onclick="setPeriod('incomePeriod','weekly')">🔄 Semanal</button>
+<button data-income="biweekly" onclick="setPeriod('incomePeriod','biweekly')">📆 Quinzenal</button>
+<button data-income="monthly" onclick="setPeriod('incomePeriod','monthly')">🗓️ Mensal</button>
+</div>
+<h3 style="margin-top:24px">💾 Quanto quero guardar</h3>
+<label>Valor</label><input id="saveInput" type="number" step=".01">
+<label>Quero guardar</label>
+<div class="periods">
+<button data-save="weekly" onclick="setPeriod('savePeriod','weekly')">🔄 Semanal</button>
+<button data-save="biweekly" onclick="setPeriod('savePeriod','biweekly')">📆 Quinzenal</button>
+<button data-save="monthly" onclick="setPeriod('savePeriod','monthly')">🗓️ Mensal</button>
+</div>
+<button class="primary" style="margin-top:17px;width:100%" onclick="saveSettings()">Salvar valores</button>
+</div>
+</section>
+
+<section id="goals" class="page">
+<div class="title"><h2>🎯 Metas</h2></div>
+<div class="card"><h3>🇪🇺 Meta em euros</h3>
+<label>Meta (€)</label><input id="goalInput" type="number" step=".01">
+<label>Já guardado (€)</label><input id="savedInput" type="number" step=".01">
+<button class="primary" style="margin-top:12px;width:100%" onclick="saveEuroGoal()">Salvar meta</button></div>
+
+<div class="card"><h3>🇧🇷 Metas no Brasil</h3><div id="brGoalsList"></div>
+<hr>
+<h3>Adicionar meta</h3>
+<label>Nome</label><input id="brName" placeholder="Ex.: Viagem">
+<label>Meta (R$)</label><input id="brTarget" type="number" step=".01">
+<label>Já guardado (R$)</label><input id="brSaved" type="number" step=".01">
+<button class="primary" style="margin-top:12px;width:100%" onclick="addBrazilGoal()">Adicionar meta</button>
+</div>
+
+<div class="card"><h3>💱 Transferências para o Brasil</h3>
+<label>Euros enviados (€)</label><input id="trEur" type="number" step=".01">
+<label>Cotação (R$ por €)</label><input id="trRate" type="number" step=".0001">
+<button class="primary" style="margin-top:12px;width:100%" onclick="addTransfer()">Registrar transferência</button>
+<div id="transferList"></div>
+</div>
+</section>
+
+<section id="more" class="page"><div class="title"><h2>⚙️ Mais</h2></div><div class="card"><p class="muted">Seu controle financeiro, simples e organizado.</p></div></section>
+</main>
+
+<nav class="nav">
+<button class="active" onclick="show('home',0)">⌂<br>Início</button>
+<button onclick="show('expenses',1)">▣<br>Despesas</button>
+<button onclick="show('spend',2)">＋<br>Gastos</button>
+<button onclick="show('goals',3)">◎<br>Metas</button>
+<button onclick="show('more',4)">•••<br>Mais</button>
+</nav>
+
+<script>
+const KEY='meuDinheiroV8';
+let d=JSON.parse(localStorage.getItem(KEY)||localStorage.getItem('meuDinheiroV8')||localStorage.getItem('meuDinheiroV7')||localStorage.getItem('meuDinheiroV6')||localStorage.getItem('meuDinheiroV5')||localStorage.getItem('meuDinheiroV4')||'null')||{
+ income:650,save:250,incomePeriod:'weekly',savePeriod:'weekly',goal:5000,saved:0,
+ expenses:[],brGoals:[],transfers:[]
+};
+d.incomePeriod=d.incomePeriod||'weekly';d.savePeriod=d.savePeriod||'weekly';d.expenses=d.expenses||[];d.brGoals=d.brGoals||[];d.transfers=d.transfers||[];
+function persist(){localStorage.setItem(KEY,JSON.stringify(d))}
+function euro(n){return new Intl.NumberFormat('pt-PT',{style:'currency',currency:'EUR'}).format(Number(n)||0)}
+function br(n){return new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'}).format(Number(n)||0)}
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]))}
+function periodName(p){return p==='weekly'?'semanal':p==='biweekly'?'quinzenal':'mensal'}
+function annual(n,p){return Number(n||0)*(p==='weekly'?52:p==='biweekly'?26:12)}
+function weeklyEquivalent(n,p){return annual(n,p)/52}
+function formatDate(s){if(!s)return '';let [y,m,day]=s.split('-');return `${day}/${m}/${y}`}
+function setPeriod(which,value){d[which]=value;persist();render()}
+function render(){
+ const total=d.expenses.reduce((s,x)=>s+Number(x.amount||0),0);
+ income.textContent=euro(d.income);save.textContent=euro(d.save);expensesTotal.textContent=euro(total);
+ free.textContent=euro(weeklyEquivalent(d.income,d.incomePeriod)-weeklyEquivalent(d.save,d.savePeriod)-total);
+ incomeLabel.textContent='Renda '+periodName(d.incomePeriod);saveLabel.textContent='Guardar '+periodName(d.savePeriod);
+ summaryTitle.textContent=d.incomePeriod==='weekly'?'Resumo da semana':d.incomePeriod==='biweekly'?'Resumo da quinzena':'Resumo do mês';
+ goal.textContent=euro(d.goal);saved.textContent=euro(d.saved)+' guardados';bar.style.width=Math.min(100,(d.saved/Math.max(1,d.goal))*100)+'%';
+ incomeInput.value=d.income;saveInput.value=d.save;goalInput.value=d.goal;savedInput.value=d.saved;
+ date.textContent=new Date().toLocaleDateString('pt-PT',{day:'2-digit',month:'2-digit'});
+ document.querySelectorAll('[data-income]').forEach(b=>b.classList.toggle('selected',b.dataset.income===d.incomePeriod));
+ document.querySelectorAll('[data-save]').forEach(b=>b.classList.toggle('selected',b.dataset.save===d.savePeriod));
+ let a=[...d.expenses].sort((x,y)=>(x.due||'9999').localeCompare(y.due||'9999'));
+ list.innerHTML=a.length?a.map(x=>`<div class="expense"><div class="row"><div><b>${esc(x.desc)}</b><div class="muted">${euro(x.amount)} • ${x.frequency==='monthly'?'Mensal':'Semanal'}${x.due?' • '+formatDate(x.due):''}</div><span class="badge">${x.frequency==='monthly'?'📅 Mensal':'🔄 Semanal'}</span>${x.due?` <span class="badge">${formatDate(x.due)}</span>`:''}${x.frequency==='temporary'?` <span class="badge soon">💳 ${x.paid||0}/${x.installments} parcelas</span>${x.endDate?` <span class="badge">Até ${formatDate(x.endDate)}</span>`:''}`:''}</div><button class="danger" onclick="delExpense('${x.id}')">Excluir</button></div></div>`).join(''):'<p class="muted">Nenhuma despesa cadastrada.</p>';
+ homeList.innerHTML=a.slice(0,5).map(x=>`<div class="expense"><b>${esc(x.desc)}</b><div class="muted">${euro(x.amount)} • ${x.frequency==='monthly'?'Mensal':'Semanal'}${x.due?' • '+formatDate(x.due):''}</div></div>`).join('')||'<p class="muted">Nenhuma despesa cadastrada.</p>';
+ const today=new Date();today.setHours(0,0,0,0);
+ const upcoming=a.filter(x=>x.due).map(x=>({...x,dt:new Date(x.due+'T00:00:00')})).sort((x,y)=>x.dt-y.dt).slice(0,5);
+ dueList.innerHTML=upcoming.length?upcoming.map(x=>{let days=Math.round((x.dt-today)/86400000);let txt=days<0?'vencida':days===0?'vence hoje':days===1?'vence amanhã':`vence em ${days} dias`;return `<div class="expense"><div class="row"><div><b>${esc(x.desc)}</b><div class="muted">${euro(x.amount)} • ${formatDate(x.due)}</div></div><span class="badge ${days<=1?'soon':''}">${txt}</span></div></div>`}).join(''):'<p class="muted">Nenhuma despesa com data próxima.</p>';
+ renderBrazil();
+}
+function renderBrazil(){
+ if(!d.brGoals.length)homeBrazil.innerHTML='<p class="muted">Nenhuma meta no Brasil cadastrada.</p>';
+ else homeBrazil.innerHTML=d.brGoals.map(g=>{let p=Math.min(100,(g.saved/Math.max(1,g.target))*100);return `<b>${esc(g.name)}</b><div class="muted">${br(g.saved)} de ${br(g.target)}</div><div class="progress"><i style="width:${p}%"></i></div>`}).join('');
+ brGoalsList.innerHTML=d.brGoals.length?d.brGoals.map((g,i)=>{let left=Math.max(0,g.target-g.saved),p=Math.min(100,g.saved/Math.max(1,g.target)*100);return `<div class="expense"><div class="row"><div><b>🇧🇷 ${esc(g.name)}</b><div class="muted">${br(g.saved)} guardados • falta ${br(left)}</div><div class="progress"><i style="width:${p}%"></i></div><small class="muted">${p.toFixed(0)}% concluído</small></div><button class="danger" onclick="delBrazilGoal(${i})">Excluir</button></div></div>`}).join(''):'<p class="muted">Nenhuma meta cadastrada.</p>';
+ transferList.innerHTML=d.transfers.length?d.transfers.slice().reverse().map(t=>`<div class="expense"><b>${euro(t.eur)} → ${br(t.brl)}</b><div class="muted">Cotação: R$ ${Number(t.rate).toFixed(4)} • ${t.date}</div></div>`).join(''):'<p class="muted">Nenhuma transferência registrada.</p>';
+}
+function saveSettings(){d.income=Number(incomeInput.value)||0;d.save=Number(saveInput.value)||0;persist();render();show('home',0)}
+function saveEuroGoal(){d.goal=Number(goalInput.value)||0;d.saved=Number(savedInput.value)||0;persist();render();show('home',0)}
+function addBrazilGoal(){let name=brName.value.trim(),target=Number(brTarget.value),saved=Number(brSaved.value)||0;if(!name||!target)return alert('Preencha o nome e o valor da meta.');d.brGoals.push({id:Date.now(),name,target,saved});persist();brName.value='';brTarget.value='';brSaved.value='';render()}
+function delBrazilGoal(i){d.brGoals.splice(i,1);persist();render()}
+function addTransfer(){let eur=Number(trEur.value),rate=Number(trRate.value);if(!eur||!rate)return alert('Informe euros e cotação.');d.transfers.push({eur,rate,brl:eur*rate,date:new Date().toLocaleDateString('pt-PT')});persist();trEur.value='';trRate.value='';render()}
+function openExpense(){
+ const m=document.createElement('div');m.className='modal';m.innerHTML=`<div class="modalbox"><h2 style="margin-top:0">➕ Nova despesa</h2>
+ <label>Nome</label><input id="xDesc" placeholder="Ex.: Renda">
+ <label>Valor (€)</label><input id="xAmount" type="number" step=".01">
+ <label>Tipo de conta</label><select id="xType" onchange="toggleDebtFields()">
+ <option value="weekly">🔄 Semanal</option>
+ <option value="monthly">📅 Mensal</option>
+ <option value="debt">⏳ Temporária / Dívida</option>
+ </select>
+ <label>Data de pagamento <span class="muted">(opcional)</span></label><input id="xDue" type="date">
+ <div id="debtFields" style="display:none">
+   <label>Quantidade de parcelas</label><input id="xInstallments" type="number" min="1" step="1" placeholder="Ex.: 3">
+   <label>Parcelas já pagas</label><input id="xPaid" type="number" min="0" step="1" value="0">
+   <p class="muted" style="margin-bottom:0">A última parcela será calculada automaticamente a partir da data do primeiro pagamento.</p>
+ </div>
+ <div style="display:flex;gap:8px;margin-top:18px"><button class="secondary" style="flex:1" onclick="this.closest('.modal').remove()">Cancelar</button><button class="primary" style="flex:1" onclick="saveExpense(this.closest('.modal'))">Salvar</button></div></div>`;
+ document.body.appendChild(m)
+}
+function toggleDebtFields(){let type=document.getElementById('xType');let box=document.getElementById('debtFields');if(type&&box)box.style.display=type.value==='debt'?'block':'none'}
+function saveExpense(m){
+ let desc=m.querySelector('#xDesc').value.trim(),amount=Number(m.querySelector('#xAmount').value),type=m.querySelector('#xType').value,due=m.querySelector('#xDue').value||'';
+ if(!desc||!amount)return alert('Preencha nome e valor.');
+ let item={id:Date.now(),desc,amount,frequency:type==='debt'?'temporary':type,due};
+ if(type==='debt'){
+   let installments=Number(m.querySelector('#xInstallments').value)||0,paid=Number(m.querySelector('#xPaid').value)||0;
+   if(!installments)return alert('Informe a quantidade de parcelas.');
+   if(paid>installments)paid=installments;
+   item.installments=installments;item.paid=paid;
+   if(due){
+     let dt=new Date(due+'T00:00:00');dt.setMonth(dt.getMonth()+installments-1);
+     item.endDate=dt.toISOString().slice(0,10);
+   }
+ }
+ d.expenses.push(item);persist();m.remove();render()
+}
+function delExpense(id){d.expenses=d.expenses.filter(x=>String(x.id)!==String(id));persist();render()}
+function show(id,n){document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));document.getElementById(id).classList.add('active');document.querySelectorAll('.nav button').forEach(x=>x.classList.remove('active'));document.querySelectorAll('.nav button')[n].classList.add('active');render();window.scrollTo(0,0)}
+render();
+</script>
+</body>
+</html>
