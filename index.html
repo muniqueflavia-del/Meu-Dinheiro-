@@ -1,81 +1,88 @@
 <!doctype html>
 <html lang="pt-BR">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#6c63ff">
-<title>Meu Dinheiro 2.0</title>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#6c63ff"><title>Meu Dinheiro</title>
 <style>
-body{margin:0;font-family:Arial,sans-serif;background:#f5f6fb;color:#222}
-header{background:#6c63ff;color:#fff;padding:24px 18px;border-radius:0 0 24px 24px}
-main{max-width:650px;margin:auto;padding:15px 15px 90px}
+*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:#f5f6fb;color:#222}
+header{background:#6c63ff;color:#fff;padding:24px 18px;border-radius:0 0 24px 24px}main{max-width:680px;margin:auto;padding:14px 14px 90px}
 .card{background:#fff;padding:16px;margin:12px 0;border-radius:18px;box-shadow:0 3px 15px #0001}
-.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.metric{background:#f7f7fb;padding:13px;border-radius:14px}
-.metric span{font-size:12px;color:#666}.metric b{display:block;font-size:20px;margin-top:5px}
-input,select,button{width:100%;padding:12px;border:1px solid #ddd;border-radius:10px;font-size:16px}
-button{background:#6c63ff;color:white;border:0;font-weight:bold;margin-top:9px}
-label{font-size:13px;color:#666;display:block;margin:9px 0 5px}
-.progress{height:16px;background:#e8e8ef;border-radius:20px;overflow:hidden}.bar{height:100%;background:#6c63ff;width:0}
-.row{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid #eee}
-.tabs{position:fixed;bottom:0;left:0;right:0;background:white;display:grid;grid-template-columns:repeat(4,1fr);gap:5px;padding:8px;box-shadow:0 -2px 12px #0001}
-.tabs button{font-size:12px;margin:0;padding:10px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.metric{background:#f7f7fb;padding:13px;border-radius:14px}.metric span{font-size:12px;color:#666}.metric b{display:block;font-size:20px;margin-top:5px}
+input,select,button{width:100%;padding:11px;border:1px solid #ddd;border-radius:10px;font-size:16px}button{background:#6c63ff;color:#fff;border:0;font-weight:bold;margin-top:8px}
+label{font-size:13px;color:#666;display:block;margin:9px 0 5px}.progress{height:15px;background:#e8e8ef;border-radius:20px;overflow:hidden}.bar{height:100%;background:#6c63ff;width:0}
+.row{display:flex;justify-content:space-between;gap:8px;align-items:center;padding:10px 0;border-bottom:1px solid #eee}.row span{flex:1}
+.tabs{position:fixed;bottom:0;left:0;right:0;background:#fff;display:grid;grid-template-columns:repeat(4,1fr);gap:5px;padding:8px;box-shadow:0 -2px 12px #0001}.tabs button{font-size:11px;margin:0;padding:10px 4px}
+.small{font-size:12px;color:#666}.danger{background:#d9534f}.secondary{background:#777}
 </style></head>
 <body>
-<header><h1>💰 Meu Dinheiro 2.0</h1><div>Seu controle financeiro</div></header>
+<header><h1>💰 Meu Dinheiro</h1><div>Seu controle financeiro</div></header>
 <main>
 <section id="home">
 <div class="card"><h2>Resumo da semana</h2><div class="grid">
-<div class="metric"><span>Renda</span><b id="income"></b></div>
-<div class="metric"><span>Livre</span><b id="free"></b></div>
-<div class="metric"><span>Guardar</span><b id="saving"></b></div>
-<div class="metric"><span>Guardado</span><b id="saved"></b></div></div></div>
-<div class="card"><h2>🎯 Meta</h2><div class="progress"><div class="bar" id="bar"></div></div><p id="goalText"></p></div>
-<div class="card"><h2>📊 Gastos</h2><div id="expensesList"></div></div>
+<div class="metric"><span>Renda</span><b id="income"></b></div><div class="metric"><span>Despesas</span><b id="totalExp"></b></div>
+<div class="metric"><span>Guardar</span><b id="saveShow"></b></div><div class="metric"><span>Disponível</span><b id="free"></b></div></div></div>
+<div class="card"><h2>🎯 Meta em euros</h2><div class="progress"><div class="bar" id="eurBar"></div></div><p id="eurGoalText"></p></div>
+<div class="card"><h2>🇧🇷 Metas no Brasil</h2><div id="brGoals"></div></div>
+<div class="card"><h2>📋 Despesas</h2><div id="expenseList"></div></div>
 </section>
 
-<section id="add" style="display:none"><div class="card"><h2>➕ Adicionar gasto</h2>
-<label>Valor (€)</label><input id="amount" type="number" step="0.01">
-<label>Descrição</label><input id="description" placeholder="Ex.: Tesco">
-<label>Categoria</label><select id="category"><option>Mercado</option><option>Gasolina</option><option>Casa</option><option>Cartão</option><option>Babá</option><option>Outros</option></select>
-<button onclick="addExpense()">Adicionar gasto</button><div id="history"></div></div></section>
+<section id="expenses" style="display:none"><div class="card"><h2>📋 Minhas despesas</h2>
+<p class="small">Crie despesas fixas ou temporárias. Nada é obrigatório.</p><div id="manageExpenses"></div>
+<h3>➕ Adicionar despesa</h3><label>Nome</label><input id="eName" placeholder="Ex.: Babá, aluguel, Klarna">
+<label>Valor (€)</label><input id="eValue" type="number" step=".01">
+<label>Tipo</label><select id="eType"><option value="fixed">Fixa</option><option value="temp">Temporária / parcelada</option></select>
+<div id="tempFields" style="display:none"><label>Número de parcelas</label><input id="eTotal" type="number" min="1" value="3"><label>Parcelas já pagas</label><input id="ePaid" type="number" min="0" value="0"></div>
+<label>Frequência</label><select id="eFreq"><option>Semanal</option><option>Mensal</option></select>
+<button onclick="addExpense()">Adicionar</button></div></section>
 
-<section id="settings" style="display:none"><div class="card"><h2>⚙️ Editar valores</h2>
-<div id="form"></div><button onclick="save()">Salvar alterações</button></div></section>
+<section id="extras" style="display:none"><div class="card"><h2>🛍️ Gasto extra</h2>
+<label>Descrição</label><input id="xName" placeholder="Ex.: restaurante"><label>Valor (€)</label><input id="xValue" type="number" step=".01">
+<label>Categoria</label><select id="xCat"></select><button onclick="addExtra()">Adicionar gasto</button><div id="extraList"></div></div>
+<div class="card"><h2>🏷️ Categorias</h2><div id="cats"></div><label>Nova categoria</label><input id="newCat" placeholder="Ex.: Lazer"><button onclick="addCat()">Adicionar categoria</button></div></section>
 
-<section id="goals" style="display:none"><div class="card"><h2>🎯 Minha meta</h2>
-<label>Meta (€)</label><input id="goalInput" type="number">
-<label>Já guardado (€)</label><input id="savedInput" type="number">
-<button onclick="saveGoal()">Salvar</button></div></section>
+<section id="goals" style="display:none"><div class="card"><h2>🎯 Meta em euros</h2>
+<label>Objetivo (€)</label><input id="goalE" type="number"><label>Já guardado (€)</label><input id="savedE" type="number"><button onclick="saveEuroGoal()">Salvar meta</button></div>
+<div class="card"><h2>🇧🇷 Meta no Brasil</h2><label>Nome da meta</label><input id="bgName" placeholder="Ex.: Viagem"><label>Objetivo (R$)</label><input id="bgTarget" type="number"><label>Já tenho (R$)</label><input id="bgSaved" type="number"><button onclick="addBRGoal()">Adicionar meta</button><div id="goalManage"></div></div>
+<div class="card"><h2>💶 → 🇧🇷 Dinheiro enviado</h2><label>Valor enviado (€)</label><input id="tEuro" type="number" step=".01"><label>Valor recebido (R$)</label><input id="tReal" type="number" step=".01"><label>Para qual meta?</label><select id="tGoal"></select><button onclick="addTransfer()">Registrar transferência</button><div id="transferList"></div></div></section>
 
-<div class="tabs">
-<button onclick="show('home')">🏠 Início</button><button onclick="show('add')">➕ Gasto</button>
-<button onclick="show('goals')">🎯 Meta</button><button onclick="show('settings')">⚙️ Ajustes</button>
-</div>
+<section id="settings" style="display:none"><div class="card"><h2>⚙️ Configurações</h2><label>Renda semanal (€)</label><input id="incomeEdit" type="number"><label>Quanto quero guardar por semana (€)</label><input id="saveEdit" type="number"><button onclick="saveSettings()">Salvar</button></div></section>
+
+<div class="tabs"><button onclick="show('home')">🏠 Início</button><button onclick="show('expenses')">📋 Despesas</button><button onclick="show('extras')">➕ Gastos</button><button onclick="show('goals')">🎯 Metas</button></div>
 </main>
 <script>
-let d=JSON.parse(localStorage.getItem('meuDinheiroApp')||'null')||{
-income:600,baby:150,loan:100,fuel:50,food:50,other:0,save:250,goal:5000,saved:0,expenses:[]
-};
+let d=JSON.parse(localStorage.getItem('meuDinheiroPro')||'null')||{income:600,save:250,goalE:5000,savedE:0,expenses:[],extras:[],categories:["Mercado","Gasolina","Casa","Cartão","Babá","Outros"],brGoals:[],transfers:[]};
 const euro=n=>new Intl.NumberFormat('pt-IE',{style:'currency',currency:'EUR'}).format(n||0);
+const real=n=>new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'}).format(n||0);
+function store(){localStorage.setItem('meuDinheiroPro',JSON.stringify(d));render()}
 function render(){
-income.textContent=euro(d.income);saving.textContent=euro(d.save);saved.textContent=euro(d.saved);
-let extras=d.expenses.reduce((s,x)=>s+x.value,0);
-let freeMoney=d.income-d.baby-d.loan-d.fuel-d.food-d.other-d.save-extras;
-free.textContent=euro(freeMoney);
-let pct=Math.min(100,d.saved/d.goal*100);bar.style.width=pct+'%';
-goalText.textContent=euro(d.saved)+' de '+euro(d.goal)+' • '+Math.round(pct)+'%';
-let fixed=[['Babá',d.baby],['Loan',d.loan],['Gasolina',d.fuel],['Mercado',d.food],['Outras',d.other]];
-expensesList.innerHTML=fixed.map(x=>`<div class="row"><span>${x[0]}</span><b>${euro(x[1])}</b></div>`).join('');
-history.innerHTML=d.expenses.map((x,i)=>`<div class="row"><span>${x.description}<br><small>${x.category}</small></span><b>${euro(x.value)} <button onclick="removeExpense(${i})" style="width:auto;padding:5px 8px;margin:0;background:#d9534f">×</button></b></div>`).join('');
-form.innerHTML=[['income','Renda'],['baby','Babá'],['loan','Loan'],['fuel','Gasolina'],['food','Mercado'],['other','Outras despesas'],['save','Guardar por semana']].map(x=>`<label>${x[1]} (€)</label><input id="f_${x[0]}" type="number" value="${d[x[0]]}">`).join('');
-goalInput.value=d.goal;savedInput.value=d.saved;
+if(!d.categories)d.categories=["Mercado","Gasolina","Casa","Cartão","Babá","Outros"];
+let expenseTotal=d.expenses.reduce((s,x)=>s+x.value,0)+d.extras.reduce((s,x)=>s+x.value,0);
+income.textContent=euro(d.income);totalExp.textContent=euro(expenseTotal);saveShow.textContent=euro(d.save);free.textContent=euro(d.income-expenseTotal-d.save);
+let p=Math.min(100,d.savedE/d.goalE*100);eurBar.style.width=p+'%';eurGoalText.textContent=`${euro(d.savedE)} de ${euro(d.goalE)} • ${p.toFixed(1)}%`;
+expenseList.innerHTML=[...d.expenses.map((x,i)=>`<div class="row"><span>${x.name}<br><small>${x.type==='fixed'?'Fixa':`Temporária • ${x.paid}/${x.total} parcelas`} • ${x.freq}</small></span><b>${euro(x.value)}</b></div>`),...d.extras.map(x=>`<div class="row"><span>${x.name}<br><small>Extra • ${x.cat}</small></span><b>${euro(x.value)}</b></div>`)].join('')||'<p class="small">Nenhuma despesa cadastrada.</p>';
+manageExpenses.innerHTML=d.expenses.map((x,i)=>`<div class="row"><span><b>${x.name}</b><br><small>${x.type==='fixed'?'Fixa':`Parcela ${x.paid}/${x.total}`} • ${x.freq}</small></span><b>${euro(x.value)}<br><button class="danger" style="width:auto;padding:5px" onclick="delExpense(${i})">×</button></b></div>`).join('')||'<p class="small">Adicione sua primeira despesa.</p>';
+xCat.innerHTML=d.categories.map(c=>`<option>${c}</option>`).join('');
+cats.innerHTML=d.categories.map((c,i)=>`<div class="row"><input id="cat${i}" value="${c}"><button style="width:auto;margin:0" onclick="renameCat(${i})">Salvar</button><button class="danger" style="width:auto;margin:0" onclick="delCat(${i})">×</button></div>`).join('');
+extraList.innerHTML=d.extras.map((x,i)=>`<div class="row"><span>${x.name} • ${x.cat}</span><b>${euro(x.value)} <button class="danger" style="width:auto;padding:5px" onclick="delExtra(${i})">×</button></b></div>`).join('');
+goalE.value=d.goalE;savedE.value=d.savedE;incomeEdit.value=d.income;saveEdit.value=d.save;
+brGoals.innerHTML=d.brGoals.map((g,i)=>{let q=Math.min(100,g.saved/g.target*100);return `<div style="margin:12px 0"><b>🇧🇷 ${g.name}</b><div class="progress"><div class="bar" style="width:${q}%"></div></div><p>${real(g.saved)} de ${real(g.target)} • ${q.toFixed(1)}%</p></div>`}).join('')||'<p class="small">Nenhuma meta no Brasil.</p>';
+tGoal.innerHTML='<option value="">Sem meta específica</option>'+d.brGoals.map((g,i)=>`<option value="${i}">${g.name}</option>`).join('');
+goalManage.innerHTML=d.brGoals.map((g,i)=>`<div class="row"><span>${g.name}: ${real(g.saved)} / ${real(g.target)}</span><button class="danger" style="width:auto" onclick="delBR(${i})">×</button></div>`).join('');
+transferList.innerHTML=d.transfers.map(t=>`<div class="row"><span>${euro(t.euro)} → ${real(t.real)}<br><small>${t.goal||'Sem meta'}</small></span></div>`).join('');
 }
-function store(){localStorage.setItem('meuDinheiroApp',JSON.stringify(d));render()}
-function addExpense(){let value=+amount.value;if(!value)return;d.expenses.push({value,description:description.value||'Gasto',category:category.value});amount.value='';description.value='';store()}
-function removeExpense(i){d.expenses.splice(i,1);store()}
-function save(){['income','baby','loan','fuel','food','other','save'].forEach(k=>d[k]=+document.getElementById('f_'+k).value||0);store();show('home')}
-function saveGoal(){d.goal=+goalInput.value||5000;d.saved=+savedInput.value||0;store();show('goals')}
-function show(id){['home','add','settings','goals'].forEach(x=>document.getElementById(x).style.display=x===id?'block':'none');render()}
+eType.onchange=()=>tempFields.style.display=eType.value==='temp'?'block':'none';
+function addExpense(){let name=eName.value.trim(),value=+eValue.value;if(!name||!value)return;let temp=eType.value==='temp';d.expenses.push({name,value,type:eType.value,freq:eFreq.value,total:temp?(+eTotal.value||1):0,paid:temp?(+ePaid.value||0):0});eName.value='';eValue.value='';store()}
+function delExpense(i){d.expenses.splice(i,1);store()}
+function addExtra(){let name=xName.value.trim(),value=+xValue.value;if(!name||!value)return;d.extras.push({name,value,cat:xCat.value});xName.value='';xValue.value='';store()}
+function delExtra(i){d.extras.splice(i,1);store()}
+function addCat(){let n=newCat.value.trim();if(n&&!d.categories.includes(n))d.categories.push(n);newCat.value='';store()}
+function renameCat(i){let n=document.getElementById('cat'+i).value.trim();if(n)d.categories[i]=n;store()}
+function delCat(i){if(d.categories.length>1)d.categories.splice(i,1);store()}
+function saveEuroGoal(){d.goalE=+goalE.value||5000;d.savedE=+savedE.value||0;store()}
+function addBRGoal(){let n=bgName.value.trim(),t=+bgTarget.value,s=+bgSaved.value||0;if(!n||!t)return;d.brGoals.push({name:n,target:t,saved:s});bgName.value='';bgTarget.value='';bgSaved.value='';store()}
+function delBR(i){d.brGoals.splice(i,1);store()}
+function addTransfer(){let e=+tEuro.value,r=+tReal.value;if(!e||!r)return;let i=tGoal.value;d.transfers.push({euro:e,real:r,goal:i===''?'Sem meta':d.brGoals[+i].name});if(i!=='')d.brGoals[+i].saved+=r;tEuro.value='';tReal.value='';store()}
+function saveSettings(){d.income=+incomeEdit.value||0;d.save=+saveEdit.value||0;store();show('home')}
+function show(id){['home','expenses','extras','goals','settings'].forEach(x=>document.getElementById(x).style.display=x===id?'block':'none');render()}
 render();
-</script>
-</body></html>
+</script></body></html>
