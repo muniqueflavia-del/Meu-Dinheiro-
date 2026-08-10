@@ -1,0 +1,20 @@
+ATUALIZAÇÃO DO APP — RENDA E VALOR A GUARDAR
+
+Adicionar na aba GASTOS:
+
+💰 Minha renda
+Valor: [campo editável]
+Recebo:
+[ 🔄 Semanal ] [ 📆 Quinzenal ] [ 🗓️ Mensal ]
+
+💾 Quanto quero guardar
+Valor: [campo editável]
+Quero guardar:
+[ 🔄 Semanal ] [ 📆 Quinzenal ] [ 🗓️ Mensal ]
+
+Cálculo:
+Semanal = 52 períodos/ano
+Quinzenal = 26 períodos/ano
+Mensal = 12 períodos/ano
+
+O painel deve mostrar automaticamente “Renda semanal”, “Renda quinzenal” ou “Renda mensal”, conforme a escolha.
