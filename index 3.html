@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#9ba98a">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-180.png">
+<title>Meu Dinheiro</title>
+<style>
+:root{--sage:#9ba98a;--dark:#0d3329;--gold:#d7aa45;--cream:#f8f7ef;--text:#18221e;--muted:#68716c}
+*{box-sizing:border-box}body{margin:0;padding-bottom:100px;background:var(--sage);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif}
+header{padding:18px}.top{display:flex;justify-content:space-between;margin-bottom:10px}.icon{width:48px;height:48px;border:0;border-radius:15px;background:#0d3329cc;color:white;font-size:22px}
+.hero{overflow:hidden;border-radius:0 0 28px 28px;background:var(--dark)}.hero img{display:block;width:100%;max-height:470px;object-fit:contain}
+main{max-width:760px;margin:auto;padding:5px 18px}.title{display:flex;justify-content:space-between;align-items:center;margin:12px 6px}.title h2{font-size:27px;margin:0}
+.card,.goal{background:var(--cream);border-radius:28px;padding:18px;margin:14px 0;box-shadow:0 5px 18px #00000012}.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.metric{background:#f2f1e9;border-radius:22px;padding:18px 16px}.metric span{display:block;color:var(--muted);margin-bottom:8px}.metric b{font-size:26px}.green{color:#3c7c50}.gold{color:#a87515}.orange{color:#c66c08}
+.goals{display:grid;grid-template-columns:1fr 1fr;gap:14px}.goal h3{margin:0 0 10px}.big{font-size:25px;font-weight:800}.muted{color:var(--muted)}.progress{height:14px;background:#dfe1d8;border-radius:20px;overflow:hidden;margin-top:14px}.progress i{display:block;height:100%;background:var(--gold)}
+input,select{width:100%;padding:12px;border:1px solid #ddd;border-radius:12px;background:white;font:inherit}label{display:block;color:var(--muted);font-size:14px;margin:10px 0 6px}.primary{background:var(--dark);color:white;border:0;border-radius:12px;padding:13px 16px;font:inherit}.secondary{background:#e9ecdf;color:var(--dark);border:0;border-radius:12px;padding:10px 14px;font-weight:700}
+.page{display:none}.page.active{display:block}.expense{padding:14px 0;border-bottom:1px solid #ddd}.expense:last-child{border:0}.row{display:flex;justify-content:space-between;gap:10px}.badge{display:inline-block;margin-top:6px;padding:4px 9px;border-radius:20px;background:#e7eadf;font-size:12px;font-weight:700}.monthly{background:#f3e5bd;color:#8b620d}.delete{background:#f8e2e2;color:#a32d2d;border:0;border-radius:9px;padding:7px 10px}
+.nav{position:fixed;z-index:20;left:0;right:0;bottom:0;background:var(--dark);border-radius:27px 27px 0 0;padding:7px;display:grid;grid-template-columns:repeat(5,1fr)}.nav button{border:0;background:transparent;color:white;border-radius:20px;padding:10px 3px;min-height:62px;font:inherit;font-size:13px}.nav button.active{background:var(--gold);color:#17231e;font-weight:700}
+@media(max-width:600px){.goals{grid-template-columns:1fr}.hero img{max-height:360px}.metric b{font-size:23px}}
+</style>
+</head>
+<body>
+<header><div class="top"><button class="icon" onclick="show('more',4)">☰</button><button class="icon">🔔</button></div><div class="hero"><img src="hero-meu-dinheiro.jpg" alt="Meu Dinheiro"></div></header>
+<main>
+<section id="home" class="page active">
+<div class="title"><h2>Resumo da semana</h2><span id="date"></span></div>
+<div class="card"><div class="grid">
+<div class="metric"><span>Renda semanal</span><b class="green" id="income">€ 650,00</b></div>
+<div class="metric"><span>Guardar</span><b class="gold" id="save">€ 250,00</b></div>
+<div class="metric"><span>Despesas</span><b class="orange" id="expensesTotal">€ 0,00</b></div>
+<div class="metric"><span>Disponível</span><b class="green" id="free">€ 400,00</b></div>
+</div></div>
+<div class="goals">
+<div class="goal"><h3>🎯 Meta em euros</h3><div class="big" id="goal">€ 5.000,00</div><p class="muted" id="saved">€ 0,00 guardados</p><div class="progress"><i id="bar"></i></div></div>
+<div class="goal"><h3>🇧🇷 Metas no Brasil</h3><div class="big" id="brgoal">R$ 0,00</div><p class="muted" id="brsaved">R$ 0,00 guardados</p><div class="progress"><i id="brbar"></i></div></div>
+</div>
+<div class="card"><div class="title"><h2>📅 Próximas despesas</h2><button class="secondary" onclick="show('expenses',1)">Ver todas</button></div><div id="homeList"></div></div>
+<div class="card"><div class="title"><h2>⏰ Vencimentos próximos</h2></div><div id="dueList"></div></div>
+</section>
+
+<section id="expenses" class="page">
+<div class="title"><h2>📋 Despesas</h2><button class="primary" onclick="addExpense()">+ Adicionar</button></div>
+<div class="card"><p class="muted">Agora você pode escolher se cada despesa é <b>semanal</b> ou <b>mensal</b>.</p><div id="list"></div></div>
+</section>
+
+<section id="spend" class="page">
+<div class="title"><h2>➕ Gastos</h2></div>
+<div class="card"><label>Renda semanal (€)</label><input id="incomeInput" type="number" step=".01"><label>Quanto quero guardar por semana (€)</label><input id="saveInput" type="number" step=".01"><button class="primary" style="margin-top:12px;width:100%" onclick="saveSettings()">Salvar valores</button></div>
+</section>
+
+<section id="goals" class="page">
+<div class="title"><h2>🎯 Metas</h2></div>
+<div class="card"><h3>🇪🇺 Meta em euros</h3><label>Meta (€)</label><input id="goalInput" type="number" step=".01"><label>Já guardado (€)</label><input id="savedInput" type="number" step=".01"><button class="primary" style="margin-top:12px;width:100%" onclick="saveGoals()">Salvar meta em euros</button></div>
+<div class="card"><h3>🇧🇷 Metas no Brasil</h3><p class="muted">Acompanhe várias metas em reais, quanto já guardou, quanto falta e o progresso.</p>
+<div id="brGoalsList"></div>
+<hr>
+<h3>Adicionar meta</h3><label>Nome da meta</label><input id="brNameInput" placeholder="Ex.: Viagem">
+<label>Meta (R$)</label><input id="brTargetInput" type="number" step=".01" placeholder="30000">
+<label>Já guardado (R$)</label><input id="brSavedNewInput" type="number" step=".01" placeholder="0">
+<button class="primary" style="margin-top:12px;width:100%" onclick="addBrGoal()">Adicionar meta</button>
+</div>
+<div class="card"><h3>💱 Transferências para o Brasil</h3><p class="muted">Registre euros enviados, reais recebidos e a cotação usada.</p><button class="primary" onclick="addTransfer()">+ Registrar transferência</button><div id="transferList"></div></div>
+</section>
+
+<section id="more" class="page"><div class="title"><h2>⚙️ Mais</h2></div><div class="card"><p class="muted">Seu controle financeiro, simples e organizado.</p></div></section>
+</main>
+
+<nav class="nav">
+<button class="active" onclick="show('home',0)">⌂<br>Início</button><button onclick="show('expenses',1)">▣<br>Despesas</button><button onclick="show('spend',2)">＋<br>Gastos</button><button onclick="show('goals',3)">◎<br>Metas</button><button onclick="show('more',4)">•••<br>Mais</button>
+</nav>
+
+<script>
+const KEY='meuDinheiroV5';
+let d=JSON.parse(localStorage.getItem(KEY)||localStorage.getItem('meuDinheiroV4')||localStorage.getItem('meuDinheiroV3')||'null')||{income:650,save:250,goal:5000,saved:0,brGoal:0,brSaved:0,brTrip:0,expenses:[]};
+d.expenses=(d.expenses||[]).map(x=>({...x,id:x.id||String(Date.now()+Math.random()),frequency:x.frequency||'weekly'}));
+d.brGoals=d.brGoals||[];
+if(!d.brGoals.length && (d.brGoal||d.brSaved)){d.brGoals=[{id:String(Date.now()),name:'Meta no Brasil',target:Number(d.brGoal||0),saved:Number(d.brSaved||0)}]}
+d.transfers=d.transfers||[];
+const euro=n=>new Intl.NumberFormat('pt-PT',{style:'currency',currency:'EUR'}).format(Number(n)||0);
+const br=n=>new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'}).format(Number(n)||0);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
+function persist(){localStorage.setItem(KEY,JSON.stringify(d))}
+function render(){
+let total=d.expenses.reduce((s,x)=>s+Number(x.amount||0),0);
+income.textContent=euro(d.income);document.getElementById('save').textContent=euro(d.save);expensesTotal.textContent=euro(total);free.textContent=euro(d.income-d.save-total);
+goal.textContent=euro(d.goal);saved.textContent=euro(d.saved)+' guardados';bar.style.width=Math.min(100,d.saved/Math.max(1,d.goal)*100)+'%';
+brgoal.textContent=br(d.brGoal);brsaved.textContent=br(d.brSaved)+' guardados';brbar.style.width=Math.min(100,d.brSaved/Math.max(1,d.brGoal)*100)+'%';
+incomeInput.value=d.income;saveInput.value=d.save;goalInput.value=d.goal;savedInput.value=d.saved;
+date.textContent=new Date().toLocaleDateString('pt-PT',{day:'2-digit',month:'2-digit'});
+let a=[...d.expenses].sort((x,y)=>(x.due||'9999').localeCompare(y.due||'9999'));
+list.innerHTML=a.length?a.map(x=>`<div class="expense"><div class="row"><div><b>${esc(x.desc)}</b><div class="muted">${euro(x.amount)} • ${x.frequency==='monthly'?'Mensal':'Semanal'}${x.due?' • '+x.due:''}</div><span class="badge ${x.frequency==='monthly'?'monthly':''}">${x.frequency==='monthly'?'📅 Mensal':'🔄 Semanal'}</span></div><button class="delete" onclick="del('${x.id}')">Excluir</button></div></div>`).join(''):'<p class="muted">Nenhuma despesa cadastrada.</p>';
+homeList.innerHTML=a.slice(0,4).map(x=>`<div class="expense"><b>${esc(x.desc)}</b><div class="muted">${euro(x.amount)} • ${x.frequency==='monthly'?'Mensal':'Semanal'}${x.due?' • '+formatDate(x.due):''}</div></div>`).join('')||'<p class="muted">Nenhuma despesa cadastrada.</p>';
+
+const today=new Date(); today.setHours(0,0,0,0);
+const upcoming=a.filter(x=>x.due).map(x=>({...x,dt:new Date(x.due+'T00:00:00')})).filter(x=>x.dt>=today).sort((x,y)=>x.dt-y.dt).slice(0,5);
+dueList.innerHTML=upcoming.length?upcoming.map(x=>{
+ const days=Math.ceil((x.dt-today)/86400000);
+ const when=days===0?'vence hoje':days===1?'vence amanhã':`vence em ${days} dias`;
+ return `<div class="expense"><div class="row"><div><b>${esc(x.desc)}</b><div class="muted">${euro(x.amount)} • ${formatDate(x.due)}</div></div><span class="badge">${when}</span></div></div>`
+}).join(''):'<p class="muted">Nenhuma despesa com data próxima.</p>';
+
+brGoalsList.innerHTML=d.brGoals.length?d.brGoals.map((g,i)=>{
+ const pct=Math.min(100,(Number(g.saved)||0)/Math.max(1,Number(g.target)||1)*100),left=Math.max(0,(Number(g.target)||0)-(Number(g.saved)||0));
+ return `<div class="expense"><div class="row"><div><b>🇧🇷 ${esc(g.name)}</b><div class="muted">${br(g.saved)} guardados de ${br(g.target)} • falta ${br(left)}</div><div class="progress"><i style="width:${pct}%"></i></div><small class="muted">${pct.toFixed(0)}% concluído</small></div><button class="delete" onclick="delBrGoal(${i})">Excluir</button></div></div>`
+}).join(''):'<p class="muted">Nenhuma meta cadastrada. Você pode criar Viagem, Casa, Reserva ou outra.</p>';
+transferList.innerHTML=d.transfers.length?d.transfers.map(t=>`<div class="expense"><b>${euro(t.euros)} → ${br(t.reais)}</b><div class="muted">Cotação: ${Number(t.rate||0).toFixed(4)} • ${t.date?formatDate(t.date):''}</div></div>`).join(''):'<p class="muted" style="margin-top:14px">Nenhuma transferência registrada.</p>';
+}
+function formatDate(s){if(!s)return '';const [y,m,day]=s.split('-');return `${day}/${m}/${y}`}
+
+function addExpense(){
+const box=document.createElement('div');
+box.style.cssText='position:fixed;inset:0;background:#0008;z-index:50;display:flex;align-items:center;justify-content:center;padding:20px';
+box.innerHTML=`<div style="background:var(--cream);padding:22px;border-radius:24px;width:min(440px,100%);box-shadow:0 20px 60px #0008">
+<h2 style="margin-top:0">➕ Nova despesa</h2>
+<label>Nome da despesa</label><input id="newDesc" placeholder="Ex.: Renda">
+<label>Valor (€)</label><input id="newAmount" type="number" step=".01" placeholder="0,00">
+<label>Frequência</label><select id="newFreq"><option value="weekly">🔄 Semanal</option><option value="monthly">📅 Mensal</option></select>
+<label>Data de pagamento <span class="muted">(opcional)</span></label>
+<input id="newDue" type="date">
+<div style="display:flex;gap:10px;margin-top:16px"><button class="secondary" style="flex:1" onclick="this.closest('[style*=fixed]').remove()">Cancelar</button><button class="primary" style="flex:1" onclick="confirmExpense(this)">Salvar</button></div>
+</div>`;
+document.body.appendChild(box);
+}
+function confirmExpense(btn){
+const modal=btn.closest('[style*=fixed]'),desc=document.getElementById('newDesc').value.trim(),amount=Number(document.getElementById('newAmount').value),frequency=document.getElementById('newFreq').value,due=document.getElementById('newDue').value;
+if(!desc||!amount){alert('Preencha o nome e o valor.');return}
+d.expenses.push({id:String(Date.now()),desc,amount,frequency,due});persist();modal.remove();render();show('expenses',1)
+}
+function del(id){d.expenses=d.expenses.filter(x=>x.id!==id);persist();render()}
+function saveSettings(){d.income=Number(incomeInput.value)||0;d.save=Number(saveInput.value)||0;persist();render();show('home',0)}
+function saveGoals(){d.goal=Number(goalInput.value)||0;d.saved=Number(savedInput.value)||0;persist();render();show('home',0)}
+function addBrGoal(){const name=brNameInput.value.trim(),target=Number(brTargetInput.value),saved=Number(brSavedNewInput.value)||0;if(!name||!target){alert('Informe o nome e o valor da meta.');return}d.brGoals.push({id:String(Date.now()),name,target,saved});persist();brNameInput.value='';brTargetInput.value='';brSavedNewInput.value='';render();show('goals',3)}
+function delBrGoal(i){d.brGoals.splice(i,1);persist();render()}
+function addTransfer(){const euros=Number(prompt('Euros enviados (€):'));if(!euros)return;const reais=Number(prompt('Reais recebidos (R$):'));if(!reais)return;const rate=reais/euros;const date=prompt('Data da transferência (AAAA-MM-DD), opcional:')||'';d.transfers.push({euros,reais,rate,date});persist();render();show('goals',3)}
+function show(id,n){document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));document.getElementById(id).classList.add('active');document.querySelectorAll('.nav button').forEach(x=>x.classList.remove('active'));document.querySelectorAll('.nav button')[n].classList.add('active');render();scrollTo(0,0)}
+render();
+</script>
+</body>
+</html>
