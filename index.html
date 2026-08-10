@@ -63,16 +63,16 @@ input,select{width:100%;padding:12px;border:1px solid #ddd;border-radius:12px;ba
 </nav>
 
 <script>
-const KEY='meuDinheiroV4';
-let d=JSON.parse(localStorage.getItem(KEY)||localStorage.getItem('meuDinheiroV3')||'null')||{income:650,save:250,goal:5000,saved:0,brGoal:0,brSaved:0,brTrip:0,expenses:[]};
+const KEY='meuDinheiroV5';
+let d=JSON.parse(localStorage.getItem(KEY)||localStorage.getItem('meuDinheiroV4')||localStorage.getItem('meuDinheiroV3')||'null')||{income:650,save:250,goal:5000,saved:0,brGoal:0,brSaved:0,brTrip:0,expenses:[]};
 d.expenses=(d.expenses||[]).map(x=>({...x,id:x.id||String(Date.now()+Math.random()),frequency:x.frequency||'weekly'}));
 const euro=n=>new Intl.NumberFormat('pt-PT',{style:'currency',currency:'EUR'}).format(Number(n)||0);
 const br=n=>new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'}).format(Number(n)||0);
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c]));
-function save(){localStorage.setItem(KEY,JSON.stringify(d))}
+function persist(){localStorage.setItem(KEY,JSON.stringify(d))}
 function render(){
 let total=d.expenses.reduce((s,x)=>s+Number(x.amount||0),0);
-income.textContent=euro(d.income);saveText.textContent=euro(d.save);expensesTotal.textContent=euro(total);free.textContent=euro(d.income-d.save-total);
+income.textContent=euro(d.income);document.getElementById('save').textContent=euro(d.save);expensesTotal.textContent=euro(total);free.textContent=euro(d.income-d.save-total);
 goal.textContent=euro(d.goal);saved.textContent=euro(d.saved)+' guardados';bar.style.width=Math.min(100,d.saved/Math.max(1,d.goal)*100)+'%';
 brgoal.textContent=br(d.brGoal);brsaved.textContent=br(d.brSaved)+' guardados';brbar.style.width=Math.min(100,d.brSaved/Math.max(1,d.brGoal)*100)+'%';
 incomeInput.value=d.income;saveInput.value=d.save;goalInput.value=d.goal;savedInput.value=d.saved;brGoalInput.value=d.brGoal;brSavedInput.value=d.brSaved;brTripInput.value=d.brTrip||0;
@@ -82,14 +82,15 @@ list.innerHTML=a.length?a.map(x=>`<div class="expense"><div class="row"><div><b>
 homeList.innerHTML=a.slice(0,4).map(x=>`<div class="expense"><b>${esc(x.desc)}</b><div class="muted">${euro(x.amount)} • ${x.frequency==='monthly'?'Mensal':'Semanal'}</div></div>`).join('')||'<p class="muted">Nenhuma despesa cadastrada.</p>';
 }
 function addExpense(){
-let desc=prompt('Nome da despesa:');if(!desc)return;let amount=Number(prompt('Valor (€):'));if(!amount)return;
+let desc=prompt('Nome da despesa:');if(!desc)return;
+let amount=Number(prompt('Valor (€):'));if(!amount)return;
 let f=(prompt('Digite SEMANAL ou MENSAL:','SEMANAL')||'SEMANAL').toLowerCase().startsWith('m')?'monthly':'weekly';
 let due=prompt('Data de pagamento (AAAA-MM-DD), ou deixe vazio:')||'';
-d.expenses.push({id:String(Date.now()),desc:desc.trim(),amount,frequency:f,due});save();render();show('expenses',1)
+d.expenses.push({id:String(Date.now()),desc:desc.trim(),amount,frequency:f,due});persist();render();show('expenses',1)
 }
-function del(id){d.expenses=d.expenses.filter(x=>x.id!==id);save();render()}
-function saveSettings(){d.income=Number(incomeInput.value)||0;d.save=Number(saveInput.value)||0;save();render();show('home',0)}
-function saveGoals(){d.goal=Number(goalInput.value)||0;d.saved=Number(savedInput.value)||0;d.brGoal=Number(brGoalInput.value)||0;d.brSaved=Number(brSavedInput.value)||0;d.brTrip=Number(brTripInput.value)||0;save();render();show('home',0)}
+function del(id){d.expenses=d.expenses.filter(x=>x.id!==id);persist();render()}
+function saveSettings(){d.income=Number(incomeInput.value)||0;d.save=Number(saveInput.value)||0;persist();render();show('home',0)}
+function saveGoals(){d.goal=Number(goalInput.value)||0;d.saved=Number(savedInput.value)||0;d.brGoal=Number(brGoalInput.value)||0;d.brSaved=Number(brSavedInput.value)||0;d.brTrip=Number(brTripInput.value)||0;persist();render();show('home',0)}
 function show(id,n){document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));document.getElementById(id).classList.add('active');document.querySelectorAll('.nav button').forEach(x=>x.classList.remove('active'));document.querySelectorAll('.nav button')[n].classList.add('active');render();scrollTo(0,0)}
 render();
 </script>
