@@ -1,0 +1,21 @@
+{
+  "name": "Meu Dinheiro",
+  "short_name": "Meu Dinheiro",
+  "description": "Seu controle financeiro pessoal",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#909b7b",
+  "theme_color": "#0d2b20",
+  "icons": [
+    {
+      "src": "icon.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "icon-180.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    }
+  ]
+}

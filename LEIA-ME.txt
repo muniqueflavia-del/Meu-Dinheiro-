@@ -1,0 +1,23 @@
+# Meu Dinheiro — atualização
+
+Arquivos separados:
+- index.html
+- manifest.json
+- hero-meu-dinheiro.jpg
+- icon.png
+- icon-180.png
+
+No GitHub, substitua o `index.html` antigo pelo novo e envie os outros 4 arquivos para a raiz do repositório.
+
+A atualização inclui:
+- renda semanal editável;
+- valor a guardar editável;
+- categorias personalizadas;
+- Klarna e Revolut como despesas temporárias;
+- metas em euros e no Brasil (R$);
+- despesas com data de pagamento;
+- ordenação por data;
+- destaque para vencendo hoje/em breve/atrasadas;
+- opção de notificações enquanto o site estiver aberto;
+- menu inferior elevado para evitar toques acidentais;
+- visual verde Cool Pine aproximado (#909B7B) com detalhes em verde escuro e dourado.
